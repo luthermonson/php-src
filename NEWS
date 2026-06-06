@@ -6,8 +6,11 @@ PHP                                                                        NEWS
   . Added --enable-embed=static support on Windows: php<N>embed.lib is now
     produced as a self-contained static library (no php<N>.dll dependency)
     by linking PHP core, statically built extensions, and the embed SAPI
-    into a single .lib, with the corresponding source-side adjustments
-    (PHP/Zend/SAPI/TSRM export defines and TSRMLS cache deduplication).
+    into a single .lib. External consumers can opt in by defining
+    PHP_EMBED_STATIC before including <sapi/embed/php_embed.h>, which
+    suppresses __declspec(dllimport) decoration on PHP/Zend/SAPI/TSRM
+    APIs so they resolve directly against the static lib. php<N>embed.lib
+    is shipped under the dist /dev/ directory as a devel library.
     (Luther Monson)
 
 - GD:

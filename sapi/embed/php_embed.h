@@ -17,6 +17,29 @@
 #ifndef _PHP_EMBED_H_
 #define _PHP_EMBED_H_
 
+/* When linking against a statically built php<N>embed.lib (Windows,
+ * built with --enable-embed=static), consumers must define
+ * PHP_EMBED_STATIC before including this header so PHP/Zend/SAPI/TSRM
+ * APIs are not expanded as __declspec(dllimport). Without this, every
+ * call to a PHP API resolves to a DLL import thunk that has no DLL to
+ * import from and fails to link with LNK2019. The flags below match
+ * what php-src itself uses when compiling its own translation units.
+ */
+#if defined(PHP_WIN32) && defined(PHP_EMBED_STATIC)
+# ifndef PHP_EXPORTS
+#  define PHP_EXPORTS
+# endif
+# ifndef LIBZEND_EXPORTS
+#  define LIBZEND_EXPORTS
+# endif
+# ifndef SAPI_EXPORTS
+#  define SAPI_EXPORTS
+# endif
+# ifndef TSRM_EXPORTS
+#  define TSRM_EXPORTS
+# endif
+#endif
+
 #include <main/php.h>
 #include <main/SAPI.h>
 #include <main/php_main.h>

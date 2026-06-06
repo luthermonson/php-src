@@ -240,7 +240,16 @@ if ($is_debug) {
     copy("$build_dir/$phppdb", "$dist_dir/dev/$phppdb");
 }
 /* copy the sapi */
-copy_file_list($build_dir, "$dist_dir", $sapi_targets);
+/* .lib SAPI targets (e.g. php<N>embed.lib built with --enable-embed=
+ * static) are devel libraries, not runtime artifacts. Route them under
+ * /dev/ and copy the remaining runtime SAPIs (.dll/.exe) to the dist
+ * root as usual. */
+$sapi_lib_targets = array_filter($sapi_targets, fn($t) => preg_match('/\\.lib$/i', $t));
+$sapi_runtime_targets = array_diff($sapi_targets, $sapi_lib_targets);
+copy_file_list($build_dir, "$dist_dir", $sapi_runtime_targets);
+if (!empty($sapi_lib_targets)) {
+    copy_file_list($build_dir, "$dist_dir/dev", $sapi_lib_targets);
+}
 
 /* copy the extensions */
 copy_file_list($build_dir, "$dist_dir/ext", $ext_targets);

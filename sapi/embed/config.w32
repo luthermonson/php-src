@@ -1,16 +1,19 @@
 // vim:ft=javascript
 
-ARG_ENABLE('embed', 'Embedded SAPI library', 'no');
+ARG_ENABLE('embed', 'Build embedded SAPI library [TYPE=shared|static]', 'no');
 
 var PHP_EMBED_PGO = false;
 
 if (PHP_EMBED != "no") {
 	SAPI('embed', 'php_embed.c', 'php' + PHP_VERSION + 'embed.lib', '/DZEND_ENABLE_STATIC_TSRMLS_CACHE=1');
 	if (PHP_EMBED == "static") {
-		// Static embed mode: php<N>embed.lib is intended to contain PHP
-		// core, extensions and the embed SAPI in a single static library
-		// (no php<N>.dll at runtime). php_embed.c must reach PHP/Zend/
-		// SAPI/TSRM symbols directly rather than through dllimport thunks.
+		// Static embed mode: php<N>embed.lib contains PHP core, all
+		// statically built extensions, and the embed SAPI in a single
+		// static library (no php<N>.dll at runtime). php_embed.c must
+		// reach PHP/Zend/SAPI/TSRM symbols directly rather than through
+		// __declspec(dllimport) thunks. The Makefile rule that links
+		// php<N>embed.lib as a fat static lib lives in win32/build/
+		// confutils.js (search is_static_embed in SAPI()).
 		ADD_FLAG('CFLAGS_EMBED',
 			'/D PHP_EMBED_STATIC' +
 			' /D PHP_EXPORTS /D LIBZEND_EXPORTS' +
